@@ -58,7 +58,7 @@ class AgentaSingleton:
         if base_id is None:
             if app_name is None or base_name is None:
                 print(
-                    f"Warning: Your configuration will not be saved permanently since app_name and base_name are not provided."
+                    "Warning: Your configuration will not be saved permanently since app_name and base_name are not provided."
                 )
             else:
                 app_id = client.get_app_by_name(
