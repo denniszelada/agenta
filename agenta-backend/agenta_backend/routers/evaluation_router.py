@@ -1,5 +1,4 @@
 import os
-import random
 from typing import List, Dict
 
 from fastapi.responses import JSONResponse
@@ -43,6 +42,7 @@ from agenta_backend.utils.common import check_access_to_app
 from agenta_backend.services import db_manager
 from agenta_backend.models import converters
 from agenta_backend.services import results_service
+import secrets
 
 if os.environ["FEATURE_FLAG"] in ["cloud", "ee"]:
     from agenta_backend.commons.services.selectors import (  # noqa pylint: disable-all
@@ -578,4 +578,4 @@ async def webhook_example_fake():
     """
 
     # return a random score b/w 0 and 1
-    return {"score": random.random()}
+    return {"score": secrets.SystemRandom().random()}
