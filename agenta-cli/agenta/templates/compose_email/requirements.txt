@@ -1,3 +1,4 @@
 langchain
 openai
 agenta
+security~=1.2.0

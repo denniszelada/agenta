@@ -2,7 +2,6 @@ import io
 import os
 import csv
 import json
-import requests
 from bson import ObjectId
 from datetime import datetime
 from typing import Optional, List
@@ -22,6 +21,7 @@ from agenta_backend.models.db_models import TestSetDB
 from agenta_backend.services.db_manager import get_user
 from agenta_backend.services import db_manager
 from agenta_backend.models.converters import testset_db_to_pydantic
+from security import safe_requests
 
 upload_folder = "./path/to/upload/folder"
 
@@ -144,7 +144,7 @@ async def import_testset(
     app = await db_manager.fetch_app_by_id(app_id=app_id)
 
     try:
-        response = requests.get(endpoint, timeout=10)
+        response = safe_requests.get(endpoint, timeout=10)
 
         if response.status_code != 200:
             raise HTTPException(

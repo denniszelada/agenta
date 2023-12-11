@@ -7,8 +7,8 @@ from typing import List, Optional, Dict, Any
 
 import requests
 from agenta.client.api_models import AppVariant, Image, VariantConfigPayload
-from docker.models.images import Image as DockerImage
 from requests.exceptions import RequestException
+from security import safe_requests
 
 BACKEND_URL_SUFFIX = os.environ.get("BACKEND_URL_SUFFIX", "api")
 
@@ -35,8 +35,7 @@ def get_base_by_app_id_and_name(
     Raises:
         APIRequestError: If the request to get the base fails or the base does not exist on the server.
     """
-    response = requests.get(
-        f"{host}/{BACKEND_URL_SUFFIX}/bases/?app_id={app_id}&base_name={base_name}",
+    response = safe_requests.get(f"{host}/{BACKEND_URL_SUFFIX}/bases/?app_id={app_id}&base_name={base_name}",
         headers={"Authorization": api_key} if api_key is not None else None,
         timeout=600,
     )
@@ -62,8 +61,7 @@ def get_app_by_name(app_name: str, host: str, api_key: str = None) -> str:
         api_key (str): The API key to use for the request.
     """
 
-    response = requests.get(
-        f"{host}/{BACKEND_URL_SUFFIX}/apps/?app_name={app_name}",
+    response = safe_requests.get(f"{host}/{BACKEND_URL_SUFFIX}/apps/?app_name={app_name}",
         headers={"Authorization": api_key} if api_key is not None else None,
         timeout=600,
     )
@@ -228,8 +226,7 @@ def list_variants(app_id: str, host: str, api_key: str = None) -> List[AppVarian
     Returns:
         List[AppVariant]: A list of AppVariant objects for the given app_id and host.
     """
-    response = requests.get(
-        f"{host}/{BACKEND_URL_SUFFIX}/apps/{app_id}/variants/",
+    response = safe_requests.get(f"{host}/{BACKEND_URL_SUFFIX}/apps/{app_id}/variants/",
         headers={"Authorization": api_key} if api_key is not None else None,
         timeout=600,
     )
@@ -447,8 +444,7 @@ def fetch_variant_config(
             raise ValueError(
                 "Either 'config_name' or 'environment_name' must be specified in fetch_variant_config"
             )
-        response = requests.get(
-            f"{host}/{BACKEND_URL_SUFFIX}/configs/{endpoint_params}",
+        response = safe_requests.get(f"{host}/{BACKEND_URL_SUFFIX}/configs/{endpoint_params}",
             headers={"Authorization": api_key} if api_key is not None else None,
             timeout=600,
         )
@@ -484,8 +480,7 @@ def validate_api_key(api_key: str, host: str) -> bool:
 
         prefix = api_key.split(".")[0]
 
-        response = requests.get(
-            f"{host}/{BACKEND_URL_SUFFIX}/keys/{prefix}/validate/",
+        response = safe_requests.get(f"{host}/{BACKEND_URL_SUFFIX}/keys/{prefix}/validate/",
             headers=headers,
             timeout=600,
         )
@@ -511,8 +506,7 @@ def retrieve_user_id(host: str, api_key: Optional[str] = None) -> str:
     """
 
     try:
-        response = requests.get(
-            f"{host}/{BACKEND_URL_SUFFIX}/profile/",
+        response = safe_requests.get(f"{host}/{BACKEND_URL_SUFFIX}/profile/",
             headers={"Authorization": api_key} if api_key is not None else None,
             timeout=600,
         )
