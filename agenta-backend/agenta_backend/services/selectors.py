@@ -35,9 +35,8 @@ async def get_user_objectid(user_uid: str) -> Tuple[str, List]:
         of the user's organization_ids.
     """
 
-    user = await engine.find_one(UserDB, UserDB.uid == user_uid)
 
-    if user is not None:
+    if (user := await engine.find_one(UserDB, UserDB.uid == user_uid)) is not None:
         user_id = str(user.uid)
         organization_ids: List = (
             [org for org in user.organizations] if user.organizations else []

@@ -145,12 +145,11 @@ async def app_variant_db_to_output(app_variant_db: AppVariantDB) -> AppVariantOu
 async def environment_db_to_output(
     environment_db: AppEnvironmentDB,
 ) -> EnvironmentOutput:
-    deployed_app_variant_id = (
+    if deployed_app_variant_id := (
         str(environment_db.deployed_app_variant)
         if environment_db.deployed_app_variant
         else None
-    )
-    if deployed_app_variant_id:
+    ):
         deployed_variant_name = (
             await db_manager.get_app_variant_instance_by_id(deployed_app_variant_id)
         ).variant_name
@@ -255,8 +254,7 @@ def feedback_db_to_pydantic(feedback_db: FeedbackDB) -> FeedbackOutput:
 
 
 def trace_db_to_pydantic(trace_db: TraceDB) -> Trace:
-    feedbacks = trace_db.feedbacks
-    if feedbacks is None:
+    if (feedbacks := trace_db.feedbacks) is None:
         result = []
     else:
         result = [

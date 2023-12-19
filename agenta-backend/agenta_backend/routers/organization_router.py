@@ -72,8 +72,7 @@ async def get_user_organization(
 ):
     try:
         user_org_data: dict = await get_user_and_org_id(request.state.user_id)
-        org_db = await get_user_own_org(user_org_data["uid"])
-        if org_db is None:
+        if (org_db := await get_user_own_org(user_org_data["uid"])) is None:
             raise HTTPException(404, detail="User does not have an organization")
         return OrganizationOutput(id=str(org_db.id), name=org_db.name)
     except Exception as e:

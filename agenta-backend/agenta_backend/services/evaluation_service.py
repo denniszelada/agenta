@@ -52,10 +52,9 @@ async def _fetch_evaluation_and_check_access(
     evaluation_id: str, **user_org_data: dict
 ) -> EvaluationDB:
     # Fetch the evaluation by ID
-    evaluation = await db_manager.fetch_evaluation_by_id(evaluation_id=evaluation_id)
 
     # Check if the evaluation exists
-    if evaluation is None:
+    if (evaluation := await db_manager.fetch_evaluation_by_id(evaluation_id=evaluation_id)) is None:
         raise HTTPException(
             status_code=404,
             detail=f"Evaluation with id {evaluation_id} not found",
@@ -77,18 +76,16 @@ async def _fetch_evaluation_scenario_and_check_access(
     evaluation_scenario_id: str, **user_org_data: dict
 ) -> EvaluationDB:
     # Fetch the evaluation by ID
-    evaluation_scenario = await db_manager.fetch_evaluation_scenario_by_id(
+    if (evaluation_scenario := await db_manager.fetch_evaluation_scenario_by_id(
         evaluation_scenario_id=evaluation_scenario_id
-    )
-    if evaluation_scenario is None:
+    )) is None:
         raise HTTPException(
             status_code=404,
             detail=f"Evaluation scenario with id {evaluation_scenario_id} not found",
         )
-    evaluation = evaluation_scenario.evaluation
 
     # Check if the evaluation exists
-    if evaluation is None:
+    if (evaluation := evaluation_scenario.evaluation) is None:
         raise HTTPException(
             status_code=404,
             detail=f"Evaluation scenario for evaluation scenario with id {evaluation_scenario_id} not found",
@@ -135,8 +132,7 @@ async def create_new_evaluation(
     current_time = datetime.utcnow()
 
     # Fetch app
-    app = await db_manager.fetch_app_by_id(app_id=payload.app_id)
-    if app is None:
+    if (app := await db_manager.fetch_app_by_id(app_id=payload.app_id)) is None:
         raise HTTPException(
             status_code=404,
             detail=f"App with id {payload.app_id} does not exist",
@@ -158,9 +154,8 @@ async def create_new_evaluation(
         created_at=current_time,
         updated_at=current_time,
     )
-    newEvaluation = await engine.save(eval_instance)
 
-    if newEvaluation is None:
+    if (newEvaluation := await engine.save(eval_instance)) is None:
         raise HTTPException(
             status_code=500, detail="Failed to create evaluation_scenario"
         )

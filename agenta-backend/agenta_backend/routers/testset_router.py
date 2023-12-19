@@ -268,8 +268,7 @@ async def update_testset(
     }
     user_org_data: dict = await get_user_and_org_id(request.state.user_id)
 
-    test_set = await db_manager.fetch_testset_by_id(testset_id=testset_id)
-    if test_set is None:
+    if (test_set := await db_manager.fetch_testset_by_id(testset_id=testset_id)) is None:
         raise HTTPException(status_code=404, detail="testset not found")
     access_app = await check_access_to_app(
         user_org_data=user_org_data, app_id=str(test_set.app.id), check_owner=False
@@ -321,9 +320,8 @@ async def get_testsets(
             {"detail": error_msg},
             status_code=400,
         )
-    app = await db_manager.fetch_app_by_id(app_id=app_id)
 
-    if app is None:
+    if (app := await db_manager.fetch_app_by_id(app_id=app_id)) is None:
         raise HTTPException(status_code=404, detail="App not found")
 
     testsets: List[TestSetDB] = await db_manager.fetch_testsets_by_app_id(app_id=app_id)
@@ -352,8 +350,7 @@ async def get_testset(
         The requested testset if found, else an HTTPException.
     """
     user_org_data: dict = await get_user_and_org_id(request.state.user_id)
-    test_set = await db_manager.fetch_testset_by_id(testset_id=testset_id)
-    if test_set is None:
+    if (test_set := await db_manager.fetch_testset_by_id(testset_id=testset_id)) is None:
         raise HTTPException(status_code=404, detail="testset not found")
     access_app = await check_access_to_app(
         user_org_data=user_org_data, app_id=str(test_set.app.id), check_owner=False
@@ -386,8 +383,7 @@ async def delete_testsets(
     deleted_ids = []
 
     for testset_id in delete_testsets.testset_ids:
-        test_set = await db_manager.fetch_testset_by_id(testset_id=testset_id)
-        if test_set is None:
+        if (test_set := await db_manager.fetch_testset_by_id(testset_id=testset_id)) is None:
             raise HTTPException(status_code=404, detail="testset not found")
         access_app = await check_access_to_app(
             user_org_data=user_org_data,

@@ -14,9 +14,8 @@ async def create_new_user(payload: User) -> UserDB:
 
 
 async def update_user(user_uid: str, payload: UserUpdate) -> UserDB:
-    user = await engine.find_one(UserDB, UserDB.uid == user_uid)
 
-    if user is not None:
+    if (user := await engine.find_one(UserDB, UserDB.uid == user_uid)) is not None:
         values_to_update = {key: value for key, value in payload.dict()}
         updated_user = user.update(values_to_update)
         await engine.save(updated_user)

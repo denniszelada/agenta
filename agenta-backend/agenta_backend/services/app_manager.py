@@ -180,10 +180,9 @@ async def terminate_and_remove_app_variant(
         raise ValueError(error_msg)
 
     try:
-        is_last_variant_for_image = await db_manager.check_is_last_variant_for_image(
+        if is_last_variant_for_image := await db_manager.check_is_last_variant_for_image(
             app_variant_db
-        )
-        if is_last_variant_for_image:
+        ):
             # remove variant + terminate and rm containers + remove base
 
             image = app_variant_db.base.image
@@ -286,8 +285,7 @@ async def remove_app(app_id: str, **kwargs: dict):
         app_name -- the app name to remove
     """
     # checks if it is the last app variant using its image
-    app = await db_manager.fetch_app_by_id(app_id)
-    if app is None:
+    if (app := await db_manager.fetch_app_by_id(app_id)) is None:
         error_msg = f"Failed to delete app {app_id}: Not found in DB."
         logger.error(error_msg)
         raise ValueError(error_msg)
@@ -322,8 +320,7 @@ async def update_variant_parameters(
     """
     assert app_variant_id is not None, "app_variant_id must be provided"
     assert parameters is not None, "parameters must be provided"
-    app_variant_db = await db_manager.fetch_app_variant_by_id(app_variant_id)
-    if app_variant_db is None:
+    if (app_variant_db := await db_manager.fetch_app_variant_by_id(app_variant_id)) is None:
         error_msg = f"Failed to update app variant {app_variant_id}: Not found in DB."
         logger.error(error_msg)
         raise ValueError(error_msg)
@@ -392,8 +389,7 @@ async def add_variant_based_on_image(
     variants = await db_manager.list_app_variants_for_app_id(
         app_id=str(app.id), **user_org_data
     )
-    already_exists = any(av for av in variants if av.variant_name == variant_name)
-    if already_exists:
+    if already_exists := any(av for av in variants if av.variant_name == variant_name):
         logger.error("App variant with the same name already exists")
         raise ValueError("App variant with the same name already exists")
 

@@ -201,8 +201,7 @@ async def fetch_base_by_id(
     """
     if base_id is None:
         raise Exception("No base_id provided")
-    base = await engine.find_one(VariantBaseDB, VariantBaseDB.id == ObjectId(base_id))
-    if base is None:
+    if (base := await engine.find_one(VariantBaseDB, VariantBaseDB.id == ObjectId(base_id))) is None:
         logger.error("Base not found")
         return False
     organization_id = base.organization.id
@@ -432,8 +431,7 @@ async def create_app_and_envs(
     """
 
     user_instance = await get_user(user_uid=user_org_data["uid"])
-    app = await fetch_app_by_name(app_name, organization_id, **user_org_data)
-    if app is not None:
+    if (app := await fetch_app_by_name(app_name, organization_id, **user_org_data)) is not None:
         raise ValueError("App with the same name already exists")
 
     organization_db = await get_organization_object(organization_id)
@@ -583,8 +581,7 @@ async def get_user(user_uid: str) -> UserDB:
         UserDB: instance of user
     """
 
-    user = await engine.find_one(UserDB, UserDB.uid == user_uid)
-    if user is None:
+    if (user := await engine.find_one(UserDB, UserDB.uid == user_uid)) is None:
         if os.environ["FEATURE_FLAG"] not in ["cloud", "ee"]:
             create_user = UserDB(uid="0")
             await engine.save(create_user)
@@ -745,17 +742,15 @@ async def add_variant_from_base_and_config(
         AppVariantDB: The newly created app variant.
     """
     new_variant_name = f"{base_db.base_name}.{new_config_name}"
-    previous_app_variant_db = await find_previous_variant_from_base_id(str(base_db.id))
-    if previous_app_variant_db is None:
+    if (previous_app_variant_db := await find_previous_variant_from_base_id(str(base_db.id))) is None:
         logger.error("Failed to find the previous app variant in the database.")
         raise HTTPException(status_code=500, detail="Previous app variant not found")
     logger.debug(f"Located previous variant: {previous_app_variant_db}")
     app_variant_for_base = await list_variants_for_base(base_db)
 
-    already_exists = any(
+    if already_exists := any(
         av for av in app_variant_for_base if av.config_name == new_config_name
-    )
-    if already_exists:
+    ):
         raise ValueError("App variant with the same name already exists")
     user_db = await get_user(user_uid=user_org_data["uid"])
     config_db = ConfigDB(
@@ -926,8 +921,7 @@ async def deploy_to_environment(environment_name: str, variant_id: str, **kwargs
     Returns:
         None
     """
-    app_variant_db = await fetch_app_variant_by_id(variant_id)
-    if app_variant_db is None:
+    if (app_variant_db := await fetch_app_variant_by_id(variant_id)) is None:
         raise ValueError("App variant not found")
 
     # Find the environment for the given app name and user
@@ -961,8 +955,7 @@ async def list_environments(app_id: str, **kwargs: dict) -> List[AppEnvironmentD
         List[AppEnvironmentDB]: A list of AppEnvironmentDB objects representing the environments for the given app ID.
     """
     logging.debug("Listing environments for app %s", app_id)
-    app_instance = await fetch_app_by_id(app_id=app_id)
-    if app_instance is None:
+    if (app_instance := await fetch_app_by_id(app_id=app_id)) is None:
         logging.error(f"App with id {app_id} not found")
         raise ValueError("App not found")
 
@@ -1091,10 +1084,9 @@ async def remove_app_testsets(app_id: str, **kwargs):
     deleted_count: int = 0
 
     # Build query expression
-    testsets = await engine.find(TestSetDB, TestSetDB.app == ObjectId(app_id))
 
     # Perform deletion if there are testsets to delete
-    if testsets is not None:
+    if (testsets := await engine.find(TestSetDB, TestSetDB.app == ObjectId(app_id))) is not None:
         for testset in testsets:
             await engine.delete(testset)
             deleted_count += 1
@@ -1330,10 +1322,9 @@ async def add_template(**kwargs: dict) -> str:
     Returns:
         template_id (Str): The Id of the created template.
     """
-    existing_template = await engine.find_one(
+    if (existing_template := await engine.find_one(
         TemplateDB, TemplateDB.tag_id == kwargs["tag_id"]
-    )
-    if existing_template is None:
+    )) is None:
         db_template = TemplateDB(**kwargs)
         await engine.save(db_template)
         return str(db_template.id)
@@ -1350,9 +1341,8 @@ async def add_zip_template(key, value):
     Returns:
         template_id (Str): The Id of the created template.
     """
-    existing_template = await engine.find_one(TemplateDB, TemplateDB.name == key)
 
-    if existing_template:
+    if existing_template := await engine.find_one(TemplateDB, TemplateDB.name == key):
         # Compare existing values with new values
         if (
             existing_template.title == value.get("name")
@@ -1447,8 +1437,7 @@ async def count_apps(**user_org_data: dict) -> int:
     """
 
     # Get user object
-    user = await get_user(user_uid=user_org_data["uid"])
-    if user is None:
+    if (user := await get_user(user_uid=user_org_data["uid"])) is None:
         return 0
 
     no_of_apps = await engine.count(AppVariantDB, AppVariantDB.user == user.id)
@@ -1507,8 +1496,7 @@ async def fetch_base_and_check_access(
     """
     if base_id is None:
         raise Exception("No base_id provided")
-    base = await engine.find_one(VariantBaseDB, VariantBaseDB.id == ObjectId(base_id))
-    if base is None:
+    if (base := await engine.find_one(VariantBaseDB, VariantBaseDB.id == ObjectId(base_id))) is None:
         logger.error("Base not found")
         raise HTTPException(status_code=404, detail="Base not found")
     organization_id = base.organization.id
@@ -1538,8 +1526,7 @@ async def fetch_app_and_check_access(
     Raises:
         HTTPException: If the app is not found or the user does not have access to it.
     """
-    app = await engine.find_one(AppDB, AppDB.id == ObjectId(app_id))
-    if app is None:
+    if (app := await engine.find_one(AppDB, AppDB.id == ObjectId(app_id))) is None:
         logger.error("App not found")
         raise HTTPException
 
@@ -1571,10 +1558,9 @@ async def fetch_app_variant_and_check_access(
     Raises:
         HTTPException: If the app variant is not found or the user does not have access to it.
     """
-    app_variant = await engine.find_one(
+    if (app_variant := await engine.find_one(
         AppVariantDB, AppVariantDB.id == ObjectId(app_variant_id)
-    )
-    if app_variant is None:
+    )) is None:
         logger.error("App variant not found")
         raise HTTPException
 

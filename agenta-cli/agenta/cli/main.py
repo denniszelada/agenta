@@ -67,8 +67,7 @@ def notify_update(available_version: str):
     is_eager=True,
 )
 def cli():
-    latest_version = check_latest_version()
-    if latest_version:
+    if latest_version := check_latest_version():
         notify_update(latest_version)
 
 
@@ -90,12 +89,11 @@ def init(app_name: str):
                     )
 
     try:
-        where_question = questionary.select(
+
+        if (where_question := questionary.select(
             "Where are you running agenta?",
             choices=["On agenta cloud", "On my local machine", "On a remote machine"],
-        ).ask()
-
-        if where_question == "On my local machine":
+        ).ask()) == "On my local machine":
             backend_host = "http://localhost"
         elif where_question == "On a remote machine":
             backend_host = questionary.text(
@@ -137,13 +135,12 @@ def init(app_name: str):
             toml.dump(config, config_file)
 
         # Ask for init option
-        init_option = questionary.select(
-            "How do you want to initialize your app?",
-            choices=["Blank App", "Start from template"],
-        ).ask()
 
         # If the user selected the second option, show a list of available templates
-        if init_option == "Start from template":
+        if (init_option := questionary.select(
+            "How do you want to initialize your app?",
+            choices=["Blank App", "Start from template"],
+        ).ask()) == "Start from template":
             current_dir = Path.cwd()
             template_dir = Path(__file__).parent.parent / "templates"
             templates = [

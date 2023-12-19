@@ -76,8 +76,7 @@ async def create_app_trace(payload: CreateTrace, **kwargs: dict) -> str:
 
     # Ensure spans exists in the db
     for span in payload.spans:
-        span_db = await engine.find_one(SpanDB, SpanDB.id == ObjectId(span))
-        if span_db is None:
+        if (span_db := await engine.find_one(SpanDB, SpanDB.id == ObjectId(span))) is None:
             raise HTTPException(404, detail=f"Span {span} does not exist")
 
     trace = TraceDB(**payload.dict(), user=user)

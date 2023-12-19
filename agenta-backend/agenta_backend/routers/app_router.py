@@ -116,12 +116,11 @@ async def get_variant_by_env(
         await check_access_to_app(user_org_data, app_id=app_id)
 
         # Fetch the app variant using the provided app_id and environment
-        app_variant_db = await db_manager.get_app_variant_by_app_name_and_environment(
-            app_id=app_id, environment=environment, **user_org_data
-        )
 
         # Check if the fetched app variant is None and raise exception if it is
-        if app_variant_db is None:
+        if (app_variant_db := await db_manager.get_app_variant_by_app_name_and_environment(
+            app_id=app_id, environment=environment, **user_org_data
+        )) is None:
             raise HTTPException(status_code=500, detail="App Variant not found")
         return await converters.app_variant_db_to_output(app_variant_db)
     except ValueError as e:
@@ -335,10 +334,9 @@ async def create_app_and_variant_from_template(
 
         logger.debug(f"Step 3 Checking if app {payload.app_name} already exists")
         app_name = payload.app_name.lower()
-        app = await db_manager.fetch_app_by_name_and_organization(
+        if (app := await db_manager.fetch_app_by_name_and_organization(
             app_name, organization_id, **user_org_data
-        )
-        if app is not None:
+        )) is not None:
             raise HTTPException(
                 status_code=400,
                 detail=f"App with name {app_name} already exists",

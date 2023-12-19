@@ -18,8 +18,7 @@ logger.setLevel(logging.DEBUG)
 
 
 async def get_organization(org_id: str) -> OrganizationDB:
-    org = await engine.find_one(OrganizationDB, OrganizationDB.id == ObjectId(org_id))
-    if org is not None:
+    if (org := await engine.find_one(OrganizationDB, OrganizationDB.id == ObjectId(org_id))) is not None:
         return org
     else:
         return None
@@ -110,10 +109,9 @@ async def check_access_to_variant(
 ) -> bool:
     if variant_id is None:
         raise Exception("No variant_id provided")
-    variant = await engine.find_one(
+    if (variant := await engine.find_one(
         AppVariantDB, AppVariantDB.id == ObjectId(variant_id)
-    )
-    if variant is None:
+    )) is None:
         logger.error("Variant not found")
         return False
     organization_id = variant.organization.id
@@ -127,8 +125,7 @@ async def check_access_to_base(
 ) -> bool:
     if base_id is None:
         raise Exception("No base_id provided")
-    base = await engine.find_one(VariantBaseDB, VariantBaseDB.id == ObjectId(base_id))
-    if base is None:
+    if (base := await engine.find_one(VariantBaseDB, VariantBaseDB.id == ObjectId(base_id))) is None:
         logger.error("Base not found")
         return False
     organization_id = base.organization.id

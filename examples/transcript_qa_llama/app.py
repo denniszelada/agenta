@@ -99,9 +99,8 @@ def query(
         str: The answer to the question.
     """
     prompt = Prompt(ag.config.prompt)
-    text_splitter = ag.config.text_splitter
 
-    if text_splitter == "TokenTextSplitter":
+    if (text_splitter := ag.config.text_splitter) == "TokenTextSplitter":
         text_splitter = TEXT_SPLITTERS[text_splitter](
             separator=ag.config.splitter_separator,
             chunk_size=ag.config.text_splitter_chunk_size,

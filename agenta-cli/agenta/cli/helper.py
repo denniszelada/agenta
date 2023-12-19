@@ -75,24 +75,21 @@ def get_api_key(backend_host: str) -> str:
         SystemExit: If the user cancels the input by pressing Ctrl+C.
     """
 
-    api_key = get_global_config("api_key")
-    if api_key:
+    if api_key := get_global_config("api_key"):
         # API key exists in the config file, ask for confirmation
-        confirm_api_key = questionary.confirm(
-            f"API Key found: {api_key}\nDo you want to use this API Key?"
-        ).ask()
 
-        if confirm_api_key:
+        if confirm_api_key := questionary.confirm(
+            f"API Key found: {api_key}\nDo you want to use this API Key?"
+        ).ask():
             return api_key
         elif confirm_api_key is None:  # User pressed Ctrl+C
             sys.exit(0)
 
-    api_key = questionary.text(
+
+    if api_key := questionary.text(
         f"(You can get your API Key here: {backend_host}/settings?tab=apiKeys) "
         "Please provide your API key:"
-    ).ask()
-
-    if api_key:
+    ).ask():
         set_global_config("api_key", api_key)
 
         return api_key

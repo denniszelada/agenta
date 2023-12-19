@@ -78,9 +78,8 @@ async def create_evaluation(
                 {"detail": error_msg},
                 status_code=400,
             )
-        app = await db_manager.fetch_app_by_id(app_id=payload.app_id)
 
-        if app is None:
+        if (app := await db_manager.fetch_app_by_id(app_id=payload.app_id)) is None:
             raise HTTPException(status_code=404, detail="App not found")
 
         new_evaluation_db = await evaluation_service.create_new_evaluation(
