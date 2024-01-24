@@ -115,7 +115,7 @@ def init(app_name: str):
             sys.exit(0)
         backend_host = (
             backend_host
-            if backend_host.startswith("http://") or backend_host.startswith("https://")
+            if backend_host.startswith(("http://", "https://"))
             else "http://" + backend_host
         )
 
