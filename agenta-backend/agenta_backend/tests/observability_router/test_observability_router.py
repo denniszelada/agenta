@@ -1,6 +1,5 @@
 import json
 import pytest
-import random
 from typing import List
 
 from agenta_backend.models.db_models import (
@@ -18,6 +17,7 @@ from agenta_backend.models.db_engine import DBEngine
 from agenta_backend.services import selectors
 
 import httpx
+import secrets
 
 
 # Initialize database engine
@@ -227,7 +227,7 @@ async def test_get_trace_endpoint():
 @pytest.mark.asyncio
 async def test_update_trace_status_endpoint():
     payload = {
-        "status": random.choice(["initiated", "completed", "stopped", "cancelled"])
+        "status": secrets.SystemRandom().choice(["initiated", "completed", "stopped", "cancelled"])
     }
 
     traces = await engine.find(TraceDB)
@@ -279,8 +279,8 @@ async def test_update_feedback_endpoint():
 
     for feedback_id in feedbacks_ids:
         feedback_data = {
-            "feedback": random.choice(["thumbs up", "thumbs down"]),
-            "score": random.choice([50, 30]),
+            "feedback": secrets.SystemRandom().choice(["thumbs up", "thumbs down"]),
+            "score": secrets.SystemRandom().choice([50, 30]),
         }
         response = await test_client.put(
             f"{BACKEND_API_HOST}/observability/feedbacks/{str(traces[0].id)}/{feedback_id}/",
