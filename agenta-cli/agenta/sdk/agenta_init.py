@@ -96,8 +96,7 @@ class Config:
             self.push(config_name="default", overwrite=overwrite, **kwargs)
         except Exception as ex:
             logger.warning(
-                "Unable to push the default configuration to the server." + str(ex)
-            )
+                "Unable to push the default configuration to the server.%s", str(ex))
 
     def push(self, config_name: str, overwrite=True, **kwargs):
         """Pushes the parameters for the app variant to the server
@@ -119,8 +118,7 @@ class Config:
             )
         except Exception as ex:
             logger.warning(
-                "Failed to push the configuration to the server with error: " + str(ex)
-            )
+                "Failed to push the configuration to the server with error: %s", str(ex))
 
     def pull(self, config_name: str = "default", environment_name: str = None):
         """Pulls the parameters for the app variant from the server and sets them to the config"""
@@ -149,13 +147,11 @@ class Config:
                     )
             except Exception as ex:
                 logger.warning(
-                    "Failed to pull the configuration from the server with error: "
-                    + str(ex)
-                )
+                    "Failed to pull the configuration from the server with error: %s", str(ex))
         try:
             self.set(**config["parameters"])
         except Exception as ex:
-            logger.warning("Failed to set the configuration with error: " + str(ex))
+            logger.warning("Failed to set the configuration with error: %s", str(ex))
 
     def all(self):
         """Returns all the parameters for the app variant"""
