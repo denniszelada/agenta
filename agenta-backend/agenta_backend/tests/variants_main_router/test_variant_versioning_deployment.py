@@ -1,13 +1,13 @@
 import os
 import httpx
 import pytest
-import random
 
 from agenta_backend.models.db_models import (
     AppDB,
     TestSetDB,
     AppVariantDB,
 )
+import secrets
 
 
 # Initialize http client
@@ -34,9 +34,9 @@ async def test_update_app_variant_parameters(app_variant_parameters_updated):
     )
     for _ in VARIANT_DEPLOY_ENVIRONMENTS:
         parameters = app_variant_parameters_updated
-        parameters["temperature"] = random.uniform(0.9, 1.5)
-        parameters["frequence_penalty"] = random.uniform(0.9, 1.5)
-        parameters["frequence_penalty"] = random.uniform(0.9, 1.5)
+        parameters["temperature"] = secrets.SystemRandom().uniform(0.9, 1.5)
+        parameters["frequence_penalty"] = secrets.SystemRandom().uniform(0.9, 1.5)
+        parameters["frequence_penalty"] = secrets.SystemRandom().uniform(0.9, 1.5)
         parameters["inputs"] = [{"name": list(testset.csvdata[0].keys())[0]}]
         payload = {"parameters": parameters}
 
