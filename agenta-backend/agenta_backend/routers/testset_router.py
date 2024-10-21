@@ -2,7 +2,6 @@ import io
 import csv
 import json
 import logging
-import requests
 from typing import Optional, List
 from datetime import datetime, timezone
 
@@ -22,6 +21,7 @@ from agenta_backend.models.api.testset_model import (
     TestSetSimpleResponse,
     TestSetOutputResponse,
 )
+from security import safe_requests
 
 if isCloudEE():
     from agenta_backend.commons.utils.permissions import (
@@ -166,7 +166,7 @@ async def import_testset(
             )
 
     try:
-        response = requests.get(endpoint, timeout=10)
+        response = safe_requests.get(endpoint, timeout=10)
 
         if response.status_code != 200:
             raise HTTPException(
