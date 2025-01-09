@@ -25,7 +25,7 @@ def hosted_platform_call(content: str):
             "inputs": [{"role": "user", "content": content}],
             "environment": llm_config["environment"],
         },
-    )
+    timeout=60)
     ag.tracing.end_span(outputs=response.json())
     return response.json()
 
