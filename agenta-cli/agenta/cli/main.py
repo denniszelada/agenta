@@ -15,6 +15,7 @@ from agenta.cli import variant_commands
 from agenta.cli import evaluation_commands
 
 from agenta.client.backend.client import AgentaApi
+from security import safe_requests
 
 BACKEND_URL_SUFFIX = os.environ.get("BACKEND_URL_SUFFIX", "api")
 
@@ -38,7 +39,7 @@ def check_latest_version() -> Union[str, None]:
     import requests
 
     try:
-        response = requests.get("https://pypi.org/pypi/agenta/json", timeout=360)
+        response = safe_requests.get("https://pypi.org/pypi/agenta/json", timeout=360)
         response.raise_for_status()
         latest_version = response.json()["info"]["version"]
         return latest_version
